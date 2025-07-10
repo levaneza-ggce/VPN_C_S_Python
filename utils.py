@@ -91,7 +91,7 @@ class NetworkUtils:
             return None
 
         except Exception as e:
-            logger.error(f"Error getting default gateway: {e}")
+            logger.error("Error getting default gateway: {}".format(e))
             return None
 
     @staticmethod
@@ -111,7 +111,7 @@ class NetworkUtils:
             return local_ip
 
         except Exception as e:
-            logger.error(f"Error getting local IP address: {e}")
+            logger.error("Error getting local IP address: {}".format(e))
             return None
 
     @staticmethod
@@ -151,7 +151,7 @@ class TunnelUtils:
         system = platform.system().lower()
 
         if system != 'linux':
-            logger.error(f"TUN interface creation is only supported on Linux, not on {system}")
+            logger.error("TUN interface creation is only supported on Linux, not on {}".format(system))
             return None
 
         try:
@@ -164,11 +164,11 @@ class TunnelUtils:
             # Create the TUN interface
             fcntl.ioctl(tun, TUNSETIFF, ifr)
 
-            logger.info(f"Created TUN interface: {name}")
+            logger.info("Created TUN interface: {}".format(name))
             return tun.fileno()
 
         except Exception as e:
-            logger.error(f"Error creating TUN interface: {e}")
+            logger.error("Error creating TUN interface: {}".format(e))
             return None
 
     @staticmethod
@@ -187,7 +187,7 @@ class TunnelUtils:
         system = platform.system().lower()
 
         if system != 'linux':
-            logger.error(f"TUN interface configuration is only supported on Linux, not on {system}")
+            logger.error("TUN interface configuration is only supported on Linux, not on {}".format(system))
             return False
 
         try:
@@ -195,16 +195,16 @@ class TunnelUtils:
             subprocess.check_call(['ip', 'link', 'set', 'dev', name, 'up'])
 
             # Assign IP address
-            subprocess.check_call(['ip', 'addr', 'add', f"{ip}/{netmask}", 'dev', name])
+            subprocess.check_call(['ip', 'addr', 'add', "{}/{}".format(ip, netmask), 'dev', name])
 
-            logger.info(f"Configured TUN interface {name} with IP {ip}/{netmask}")
+            logger.info("Configured TUN interface {} with IP {}/{}".format(name, ip, netmask))
             return True
 
         except subprocess.CalledProcessError as e:
-            logger.error(f"Error configuring TUN interface: {e}")
+            logger.error("Error configuring TUN interface: {}".format(e))
             return False
         except Exception as e:
-            logger.error(f"Unexpected error configuring TUN interface: {e}")
+            logger.error("Unexpected error configuring TUN interface: {}".format(e))
             return False
 
     @staticmethod
@@ -225,7 +225,7 @@ class TunnelUtils:
 
         try:
             if system == 'linux':
-                cmd = ['ip', 'route', 'add', f"{network}/{netmask}", 'via', gateway]
+                cmd = ['ip', 'route', 'add', "{}/{}".format(network, netmask), 'via', gateway]
                 if interface:
                     cmd.extend(['dev', interface])
                 subprocess.check_call(cmd)
@@ -239,17 +239,17 @@ class TunnelUtils:
                 subprocess.check_call(cmd)
 
             else:
-                logger.error(f"Unsupported operating system: {system}")
+                logger.error("Unsupported operating system: {}".format(system))
                 return False
 
-            logger.info(f"Added route to {network}/{netmask} via {gateway}")
+            logger.info("Added route to {}/{} via {}".format(network, netmask, gateway))
             return True
 
         except subprocess.CalledProcessError as e:
-            logger.error(f"Error adding route: {e}")
+            logger.error("Error adding route: {}".format(e))
             return False
         except Exception as e:
-            logger.error(f"Unexpected error adding route: {e}")
+            logger.error("Unexpected error adding route: {}".format(e))
             return False
 
 class PacketUtils:
@@ -312,7 +312,7 @@ class PacketUtils:
             return result
 
         except Exception as e:
-            logger.error(f"Error parsing IP packet: {e}")
+            logger.error("Error parsing IP packet: {}".format(e))
             return {}
 
     @staticmethod
@@ -385,7 +385,7 @@ class PacketUtils:
             return packet
 
         except Exception as e:
-            logger.error(f"Error creating IP packet: {e}")
+            logger.error("Error creating IP packet: {}".format(e))
             return b''
 
     @staticmethod
@@ -434,7 +434,7 @@ class CryptoUtils:
             import os
             return os.urandom(length)
         except Exception as e:
-            logger.error(f"Error generating key: {e}")
+            logger.error("Error generating key: {}".format(e))
             return b''
 
     @staticmethod
@@ -468,7 +468,7 @@ class CryptoUtils:
             logger.error("cryptography package not installed. Install it with: pip install cryptography")
             return data
         except Exception as e:
-            logger.error(f"Error encrypting data: {e}")
+            logger.error("Error encrypting data: {}".format(e))
             return data
 
     @staticmethod
@@ -502,7 +502,7 @@ class CryptoUtils:
             logger.error("cryptography package not installed. Install it with: pip install cryptography")
             return data
         except Exception as e:
-            logger.error(f"Error decrypting data: {e}")
+            logger.error("Error decrypting data: {}".format(e))
             return data
 
 # Helper functions
@@ -558,14 +558,14 @@ def print_system_info() -> None:
     release = platform.release()
     version = platform.version()
 
-    print(f"System: {system} {release} {version}")
+    print("System: {} {} {}".format(system, release, version))
 
     # Get network interfaces
     local_ip = NetworkUtils.get_default_gateway()
     gateway = NetworkUtils.get_default_gateway()
 
-    print(f"Local IP: {local_ip}")
-    print(f"Default Gateway: {gateway}")
+    print("Local IP: {}".format(local_ip))
+    print("Default Gateway: {}".format(gateway))
 
     # Check if running as root
     if is_root():
@@ -576,6 +576,6 @@ def print_system_info() -> None:
     # Check dependencies
     missing = check_dependencies()
     if missing:
-        print(f"Missing dependencies: {', '.join(missing)}")
+        print("Missing dependencies: {}".format(', '.join(missing)))
     else:
         print("All dependencies are installed")

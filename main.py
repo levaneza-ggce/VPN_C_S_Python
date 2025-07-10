@@ -75,7 +75,7 @@ def check_requirements():
     # Check for missing dependencies
     missing = check_dependencies()
     if missing:
-        logger.warning(f"Missing dependencies: {', '.join(missing)}")
+        logger.warning("Missing dependencies: {}".format(', '.join(missing)))
         if "cryptography" in missing:
             logger.warning("Install cryptography with: pip install cryptography")
         return False
@@ -176,5 +176,5 @@ if __name__ == '__main__':
     except KeyboardInterrupt:
         print("\nVPN system stopped by user")
     except Exception as e:
-        logger.error(f"Error: {e}")
+        logger.error("Error: {}".format(e))
         sys.exit(1)
