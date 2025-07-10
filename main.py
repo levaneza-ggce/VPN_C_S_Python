@@ -18,7 +18,21 @@ For detailed usage instructions, run:
 import sys
 import argparse
 import logging
-from typing import List, Optional
+
+# Check Python version for type annotations support
+import platform
+PYTHON_VERSION = tuple(map(int, platform.python_version().split('.')[:2]))
+if PYTHON_VERSION >= (3, 6):
+    from typing import List, Optional
+else:
+    # Create dummy type annotation classes for older Python versions
+    class List:
+        def __getitem__(self, item):
+            return None
+
+    class Optional:
+        def __getitem__(self, item):
+            return None
 
 # Import the client and server modules
 from client import VPNClient, main as client_main
@@ -32,7 +46,7 @@ logging.basicConfig(
 )
 logger = logging.getLogger('vpn_main')
 
-def show_banner() -> None:
+def show_banner():
     """Display the VPN system banner."""
     banner = """
     ____   ____  _____   __  ____    ____  ______  
@@ -45,7 +59,7 @@ def show_banner() -> None:
     """
     print(banner)
 
-def check_requirements() -> bool:
+def check_requirements():
     """
     Check if the system meets the requirements to run the VPN.
 
@@ -68,7 +82,7 @@ def check_requirements() -> bool:
 
     return True
 
-def parse_args(args: Optional[List[str]] = None) -> argparse.Namespace:
+def parse_args(args=None):
     """
     Parse command line arguments.
 
@@ -109,7 +123,7 @@ def parse_args(args: Optional[List[str]] = None) -> argparse.Namespace:
 
     return parsed_args
 
-def main() -> None:
+def main():
     """Main function to run the VPN system."""
     # Show the banner
     show_banner()
