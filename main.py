@@ -114,6 +114,7 @@ def parse_args(args=None):
     client_parser.add_argument('--port', type=int, default=5000, help='VPN server port')
     client_parser.add_argument('--ca-cert', help='Path to the CA certificate file for server verification')
     client_parser.add_argument('--interactive', action='store_true', help='Run in interactive mode')
+    client_parser.add_argument('--insecure', action='store_true', help='Disable TLS certificate verification (insecure, testing only)')
 
     # System info command
     parser.add_argument('--system-info', action='store_true', help='Display system information')
@@ -156,18 +157,33 @@ def main():
         server_args.pop('mode', None)
         server_args.pop('system_info', None)
 
-        # Run the server
-        sys.argv = [sys.argv[0]]  # Reset sys.argv to avoid conflicts with argparse
+        # Forward parsed args to server main by reconstructing sys.argv
+        sys.argv = [sys.argv[0]]
+        if args.host:
+            sys.argv.extend(['--host', args.host])
+        if args.port is not None:
+            sys.argv.extend(['--port', str(args.port)])
+        if args.cert:
+            sys.argv.extend(['--cert', args.cert])
+        if args.key:
+            sys.argv.extend(['--key', args.key])
+        if getattr(args, 'generate_cert', False):
+            sys.argv.append('--generate-cert')
         server_main()
 
     elif args.mode == 'client':
-        # Convert namespace to dictionary and remove 'mode'
-        client_args = vars(args)
-        client_args.pop('mode', None)
-        client_args.pop('system_info', None)
-
-        # Run the client
-        sys.argv = [sys.argv[0]]  # Reset sys.argv to avoid conflicts with argparse
+        # Forward parsed args to client main by reconstructing sys.argv
+        sys.argv = [sys.argv[0]]
+        if args.host:
+            sys.argv.extend(['--host', args.host])
+        if args.port is not None:
+            sys.argv.extend(['--port', str(args.port)])
+        if args.ca_cert:
+            sys.argv.extend(['--ca-cert', args.ca_cert])
+        if getattr(args, 'interactive', False):
+            sys.argv.append('--interactive')
+        if getattr(args, 'insecure', False):
+            sys.argv.append('--insecure')
         client_main()
 
 if __name__ == '__main__':
